@@ -1,0 +1,47 @@
+<div class="row justify-content-center">
+  <div class="col-12 col-md-7 col-lg-5">
+    <div class="card shadow-sm">
+      <div class="card-body p-4">
+        <div class="d-flex justify-content-between align-items-start">
+          <div>
+            <h2 class="mb-1">Customer Login</h2>
+            <p class="text-muted mb-0">Login to browse products and place orders (Demo login).</p>
+          </div>
+        </div>
+
+        @if (error) {
+          <div class="alert alert-danger py-2">{{ error }}</div>
+        }
+
+        <!-- Email -->
+        <div class="mb-3">
+          <label class="form-label">Email</label>
+          <input
+            class="form-control"
+            [(ngModel)]="email"
+            type="email"
+            placeholder="e.g., pranaya@gmail.com"
+            autocomplete="email"
+          />
+        </div>
+
+        <!-- Password -->
+        <div class="mb-3">
+          <label class="form-label">Password</label>
+          <input
+            class="form-control"
+            [(ngModel)]="password"
+            type="password"
+            placeholder="Enter password"
+            autocomplete="current-password"
+          />
+        </div>
+
+        <!-- Actions -->
+        <div class="d-grid">
+          <button class="btn btn-primary" (click)="login()">Login</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,169 @@
+<!-- PAGE HEADER -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-4">
+  <div>
+    <h2 class="mb-0">Checkout</h2>
+    <div class="text-muted small">Delivery address & Cash on Delivery</div>
+  </div>
+
+  <a class="btn btn-outline-primary btn-sm" routerLink="/cart"> ← Back to Cart </a>
+</div>
+@if (error) {
+  <div
+    class="alert alert-danger shadow-sm py-2 mb-3 d-flex justify-content-between align-items-center"
+  >
+    <span>{{ error }}</span>
+
+    <button type="button" class="btn-close" aria-label="Close" (click)="error = ''"></button>
+  </div>
+}
+<!-- LEFT: ADDRESS + PAYMENT -->
+<div class="row g-3">
+  <div class="col-12 col-lg-7">
+    <div class="card shadow-sm">
+      <div class="card-body">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h5 class="mb-0">Delivery Address</h5>
+          <span class="badge rounded-pill bg-light text-dark border"> Step 1 of 2 </span>
+        </div>
+        <div class="row g-2">
+          <div class="col-md-6">
+            <div>
+              <div class="form-floating">
+                <input
+                  type="text"
+                  [(ngModel)]="fullName"
+                  class="form-control"
+                  placeholder="Full Name"
+                />
+                <label>Full Name</label>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-floating">
+              <input class="form-control" [(ngModel)]="phone" placeholder="Phone" />
+              <label>Phone (10 digits)</label>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <div class="form-floating">
+              <textarea
+                name=""
+                id=""
+                style="height: 70px"
+                class="form-control"
+                [(ngModel)]="addressLine"
+              ></textarea>
+              <label>Address (House no, street, landmark)</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" [(ngModel)]="city" placeholder="city" class="form-control" />
+              <label>City</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" [(ngModel)]="state" placeholder="State" class="form-control" />
+              <label>State</label>
+            </div>
+          </div>
+          <div class="col-md-4">
+            <div class="form-floating">
+              <input type="text" [(ngModel)]="pincode" placeholder="Pincode" class="form-control" />
+              <label>Pincode (6 digits)</label>
+            </div>
+          </div>
+        </div>
+        <hr class="my-4" />
+        <!-- STEP 2: PAYMENT -->
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <h5 class="mb-0">Payment Method</h5>
+          <span class="badge rounded-pill bg-light text-dark border"> Step 2 of 2 </span>
+        </div>
+
+        <div class="border rounded p-3 bg-light">
+          <div class="form-check">
+            <input type="radio" class="form-check-input" checked />
+            <label class="form-check-label fw-semibold"> Cash on Delivery (COD) </label>
+          </div>
+          <div class="small text-muted mt-1">Pay when your order is delivered.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- RIGHT: ORDER SUMMARY -->
+<div class="col-12 col-lg-5">
+  <div class="card shadow-sm checkout-summary">
+    <div class="card-body">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h5 class="mb-0">Order Summary</h5>
+        <span class="small text-muted">{{ sum.totalItems }} item(s)</span>
+      </div>
+      <!-- ITEMS -->
+      <div class="border rounded bg-light p-2 mb-3">
+        @for (it of items; track it.productId) {
+          <div class="d-flex align-items-start gap-2 py-2 border-bottom">
+            <img
+              [src]="it.imageUrl"
+              alt="{{ it.name }}"
+              class="rounded border"
+              style="width: 52px; height: 52px; object-fit: cover"
+            />
+            <div class="flex-grow-1">
+              <div class="fw-semibold small">
+                {{ it.name }}
+              </div>
+              <div class="small text-muted">
+                Qty {{ it.qty }} × {{ it.unitPrice | currency: 'INR' : 'symbol' : '1.0-0' }}
+                @if (it.discountPercent > 0) {
+                  <div class="text-success-small">-{{ it.discountPercent }}%</div>
+                }
+              </div>
+            </div>
+          </div>
+        }
+      </div>
+      <!-- TOTALS -->
+      <div class="d-flex justify-content-between small">
+        <span class="text-muted">MRP Subtotal</span>
+        <span>{{ sum.subtotalMrp | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+      </div>
+      <div class="d-flex justify-content-between small">
+        <span class="text-muted">Discount</span>
+        <span class="text-success">
+          -{{ sum.discount | currency: 'INR' : 'symbol' : '1.0-0' }}
+        </span>
+      </div>
+      <div class="d-flex justify-content-between small mt-1">
+        <span class="text-muted">Subtotal</span>
+        <span>{{ sum.subtotalPayable | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+      </div>
+
+      <div class="d-flex justify-content-between small mt-1">
+        <span>
+          @if (sum.shipping === 0) {
+            <b>Free</b>
+          } @else {
+            {{ sum.shipping | currency: 'INR' : 'symbol' : '1.0-0' }}
+          }
+        </span>
+      </div>
+      <hr class="my-3" />
+      <div class="d-flex justify-content-between align-items-center">
+        <span class="fw-semibold">Grand Total</span>
+        <span>{{ sum.grandTotal | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+      </div>
+      <div class="small text-success mt-1">
+        You saved {{ sum.discount | currency: 'INR' : 'symbol' : '1.0-0' }}
+      </div>
+      <div>
+        <button class="btn btn-success btn-lg" (click)="placeOrder()" [disabled]="placing">
+          Place Order (COD)
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

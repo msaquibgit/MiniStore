@@ -1,0 +1,240 @@
+<!-- Added to cart message -->
+@if (product) {
+  @if (addedMsg) {
+    <div class="alert alert-success shadow-sm d-flex justify-content-between align-items-center">
+      <div>
+        <div class="fw-semibold">{{ addedMsg }}</div>
+        <div class="small text-muted">You can continue shopping or view your cart.</div>
+      </div>
+      <div class="d-flex gap-2">
+        <a class="btn btn-sm btn-outline-success" routerLink="/cart">View Cart</a>
+        <button class="btn btn-sm btn-outline-secondary" type="button" (click)="addedMsg = ''">
+          Dismiss
+        </button>
+      </div>
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+    <div>
+      <h2 class="mb-1">{{ product?.name }}</h2>
+      <div class="text-muted">
+        {{ product?.brand }} • SKU: <span class="fw-semibold">{{ product?.sku }}</span>
+      </div>
+    </div>
+
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" routerLink="/products">← Back to Products</a>
+      <a class="btn btn-outline-success" routerLink="/cart">Go to Cart</a>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <!-- LEFT: Image -->
+    <div class="col-12 col-lg-5">
+      <div class="card shadow-sm">
+        <div class="p-3">
+          <div class="bg-light border rounded overflow-hidden product-img">
+            <img
+              [src]="product?.imageUrl"
+              alt="product"
+              style="width: 100%; height: 100%; object-fit: cover"
+            />
+          </div>
+
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            <span class="badge text-bg-dark">{{ product?.category }}</span>
+
+            <span class="badge text-bg-warning text-dark"> ★ {{ product?.rating }} </span>
+
+            @if (product?.discountPercent > 0) {
+              <span class="badge text-bg-success">-{{ product?.discountPercent }}% OFF</span>
+            }
+
+            @if (product?.inStock) {
+              <span class="badge text-bg-primary">In Stock</span>
+            } @else {
+              <span class="badge text-bg-secondary">Out of Stock</span>
+            }
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT: Core info + Actions -->
+    <div class="col-12 col-lg-7">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <!-- Price block -->
+          <div class="d-flex flex-wrap justify-content-between align-items-end gap-3">
+            <div>
+              <div class="d-flex flex-wrap align-items-end gap-2">
+                <div class="display-6 fw-bold mb-0">
+                  {{ product?.price | currency: 'INR' : 'symbol' : '1.0-0' }}
+                </div>
+
+                <div class="text-muted">
+                  <span class="text-decoration-line-through">
+                    {{ product?.mrp | currency: 'INR' : 'symbol' : '1.0-0' }}
+                  </span>
+                </div>
+              </div>
+
+              @if (product?.discountPercent > 0) {
+                <div class="small text-success fw-semibold">
+                  You save
+                  {{ product?.mrp - product?.price | currency: 'INR' : 'symbol' : '1.0-0' }}
+                </div>
+              }
+            </div>
+
+            <!-- Stock qty -->
+            <div class="text-muted">
+              @if (product?.inStock) {
+                <span class="badge text-bg-primary">Available: {{ product.stockQty }}</span>
+              } @else {
+                <span class="badge text-bg-secondary">Currently Unavailable</span>
+              }
+            </div>
+          </div>
+
+          <!-- Key info chips -->
+          <div class="d-flex flex-wrap gap-2 mt-3">
+            <span class="badge rounded-pill text-bg-light border text-dark">
+              🚚 Delivery: {{ product?.deliveryDays }} day(s)
+            </span>
+
+            <span class="badge rounded-pill text-bg-light border text-dark">
+              @if (product?.freeDelivery) {
+                Free Delivery
+              } @else {
+                Delivery Charges Apply
+              }
+            </span>
+
+            <span class="badge rounded-pill text-bg-light border text-dark">
+              🛡 Warranty: {{ product?.warrantyMonths }} month(s)
+            </span>
+
+            <span class="badge rounded-pill text-bg-light border text-dark">
+              🏪 Seller: {{ product?.sellerName }}
+            </span>
+          </div>
+
+          <!-- Actions row -->
+          <div class="card border-0 bg-light mt-4">
+            <div class="card-body">
+              <div class="d-flex flex-wrap gap-2 align-items-end">
+                <div style="width: 160px">
+                  <label class="form-label mb-1">Quantity</label>
+                  <select class="form-select" [(ngModel)]="qty">
+                    <option [ngValue]="1">1</option>
+                    <option [ngValue]="2">2</option>
+                    <option [ngValue]="3">3</option>
+                    <option [ngValue]="4">4</option>
+                  </select>
+                </div>
+
+                <button
+                  class="btn btn-success"
+                  (click)="addToCart()"
+                  [disabled]="!product?.inStock"
+                >
+                  Add to Cart
+                </button>
+
+                <button class="btn btn-primary" (click)="buyNow()" [disabled]="!product?.inStock">
+                  Buy Now
+                </button>
+
+                <a class="btn btn-outline-primary ms-auto" routerLink="/cart"> View Cart </a>
+              </div>
+
+              <div class="small text-muted mt-2">
+                Add to Cart keeps you here. Buy Now takes you to checkout.
+              </div>
+            </div>
+          </div>
+
+          <!-- Tabs: Details on demand (professional + reduces forced scroll) -->
+          <ul class="nav nav-tabs mt-4" role="tablist">
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link active"
+                data-bs-toggle="tab"
+                data-bs-target="#tabDesc"
+                type="button"
+                role="tab"
+              >
+                Description
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                data-bs-toggle="tab"
+                data-bs-target="#tabHighlights"
+                type="button"
+                role="tab"
+              >
+                Highlights
+              </button>
+            </li>
+            <li class="nav-item" role="presentation">
+              <button
+                class="nav-link"
+                data-bs-toggle="tab"
+                data-bs-target="#tabDelivery"
+                type="button"
+                role="tab"
+              >
+                Delivery & Warranty
+              </button>
+            </li>
+          </ul>
+
+          <div class="tab-content border border-top-0 rounded-bottom p-3 bg-white">
+            <!-- Description -->
+            <div class="tab-pane fade show active" id="tabDesc" role="tabpanel">
+              <p class="text-muted mb-0">
+                {{ product?.description }}
+              </p>
+            </div>
+
+            <!-- Highlights -->
+            <div class="tab-pane fade" id="tabHighlights" role="tabpanel">
+              <div class="row g-2 text-muted">
+                @for (h of product?.highlights; track h) {
+                  <div class="col-12 col-md-6">
+                    <div class="d-flex gap-2">
+                      <span class="text-success fw-bold">✓</span>
+                      <span>{{ h }}</span>
+                    </div>
+                  </div>
+                }
+              </div>
+            </div>
+
+            <!-- Delivery & Warranty -->
+            <div class="tab-pane fade" id="tabDelivery" role="tabpanel">
+              <div class="text-muted">
+                <div class="mb-2"><b>Delivery ETA:</b> {{ product?.deliveryDays }} day(s)</div>
+                <div class="mb-2">
+                  <b>Delivery:</b>
+                  @if (product?.freeDelivery) {
+                    Free Delivery
+                  } @else {
+                    Delivery Charges Apply
+                  }
+                </div>
+                <div class="mb-2"><b>Warranty:</b> {{ product?.warrantyMonths }} month(s)</div>
+                <div><b>Seller:</b> {{ product?.sellerName }}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}

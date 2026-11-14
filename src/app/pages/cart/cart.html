@@ -1,0 +1,168 @@
+<!-- Header -->
+<div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+  <div>
+    <h2 class="mb-1">Your Cart</h2>
+    <div class="text-muted">
+      Review items, update quantity, and checkout securely.
+      @if (items.length > 0) {
+        <span class="ms-2 small">({{ sum.totalItems }} item(s))</span>
+      }
+    </div>
+  </div>
+
+  <div class="d-flex gap-2">
+    <a class="btn btn-outline-primary" routerLink="/products">← Continue Shopping</a>
+    <button class="btn btn-outline-danger" (click)="clear()" [disabled]="items.length === 0">
+      Clear Cart
+    </button>
+  </div>
+</div>
+
+@if (items.length === 0) {
+  <!-- Empty state -->
+  <div class="card shadow-sm">
+    <div class="card-body text-center p-5">
+      <div class="display-6 mb-2">🛒</div>
+      <h4 class="mb-2">Your cart is empty</h4>
+      <p class="text-muted mb-4">Looks like you haven’t added anything yet.</p>
+      <a class="btn btn-primary" routerLink="/products">Browse Products</a>
+    </div>
+  </div>
+} @else {
+  <div class="row g-3">
+    <!-- LEFT: Items -->
+    <div class="col-12 col-lg-8">
+      @for (i of items; track i.productId) {
+        <div class="card shadow-sm mb-3">
+          <div class="card-body">
+            <div class="d-flex gap-3 align-items-start">
+              <!-- Image -->
+              <div
+                class="bg-light border rounded overflow-hidden"
+                style="width: 96px; height: 96px"
+              >
+                <img
+                  [src]="i.imageUrl"
+                  alt="item"
+                  style="width: 100%; height: 100%; object-fit: cover"
+                />
+              </div>
+
+              <!-- Details -->
+              <div class="flex-grow-1">
+                <div class="d-flex justify-content-between align-items-start gap-2">
+                  <div>
+                    <div class="fw-semibold fs-5">{{ i.name }}</div>
+                    <div class="text-muted small">{{ i.brand }} • SKU: {{ i.sku }}</div>
+                  </div>
+
+                  <!-- Remove -->
+                  <button
+                    class="btn btn-sm btn-outline-danger"
+                    title="Remove item"
+                    (click)="remove(i.productId)"
+                  >
+                    Remove
+                  </button>
+                </div>
+
+                <!-- Price row -->
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-2">
+                  <div class="fw-bold">
+                    {{ i.unitPrice | currency: 'INR' : 'symbol' : '1.0-0' }}
+                  </div>
+
+                  <div class="text-muted small text-decoration-line-through">
+                    {{ i.mrp | currency: 'INR' : 'symbol' : '1.0-0' }}
+                  </div>
+
+                  @if (i.discountPercent > 0) {
+                    <span class="badge text-bg-success">-{{ i.discountPercent }}%</span>
+                  }
+
+                  <div class="ms-auto text-muted small">
+                    Line Total:
+                    <b>{{ lineTotal(i) | currency: 'INR' : 'symbol' : '1.0-0' }}</b>
+                  </div>
+                </div>
+
+                <!-- Qty -->
+                <div class="d-flex flex-wrap align-items-center gap-2 mt-3">
+                  <div class="text-muted small">Qty</div>
+
+                  <div class="btn-group" role="group" aria-label="Quantity">
+                    <button class="btn btn-outline-success btn-sm" (click)="decrement(i.productId)">
+                      −
+                    </button>
+                    <button class="btn btn-primary btn-sm" disabled style="min-width: 44px">
+                      {{ i.qty }}
+                    </button>
+                    <button class="btn btn-outline-success btn-sm" (click)="increment(i.productId)">
+                      +
+                    </button>
+                  </div>
+
+                  <div class="text-muted small ms-2">Added: {{ i.addedAt | date: 'medium' }}</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    </div>
+
+    <!-- RIGHT: Summary -->
+    <div class="col-12 col-lg-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h5 class="mb-3">Order Summary</h5>
+
+          <div class="d-flex justify-content-between">
+            <span class="text-muted">MRP Subtotal</span>
+            <span>{{ sum.subtotalMrp | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between mt-2">
+            <span class="text-muted">Discount</span>
+            <span class="text-success">
+              -{{ sum.discount | currency: 'INR' : 'symbol' : '1.0-0' }}
+            </span>
+          </div>
+
+          <div class="d-flex justify-content-between mt-2">
+            <span class="text-muted">Subtotal</span>
+            <span>{{ sum.subtotalPayable | currency: 'INR' : 'symbol' : '1.0-0' }}</span>
+          </div>
+
+          <div class="d-flex justify-content-between mt-2">
+            <span class="text-muted">Shipping</span>
+            <span>
+              @if (sum.shipping === 0) {
+                <b>Free</b>
+              } @else {
+                {{ sum.shipping | currency: 'INR' : 'symbol' : '1.0-0' }}
+              }
+            </span>
+          </div>
+
+          <hr />
+
+          <div class="d-flex justify-content-between align-items-center">
+            <span class="fw-semibold">Grand Total</span>
+            <span class="fw-bold fs-5">
+              {{ sum.grandTotal | currency: 'INR' : 'symbol' : '1.0-0' }}
+            </span>
+          </div>
+
+          <div class="small text-success mt-2">
+            You saved {{ sum.discount | currency: 'INR' : 'symbol' : '1.0-0' }} on this order
+          </div>
+
+          <div class="d-grid mt-3">
+            <button class="btn btn-success" (click)="goCheckout()">Proceed to Checkout</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+}
